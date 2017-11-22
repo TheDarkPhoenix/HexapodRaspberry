@@ -3,9 +3,13 @@
 #include <iostream>
 #include <strstream>
 #include <unistd.h>
+#include <chrono>
+#include <thread>
 
 using namespace cv;
 using namespace std;
+using namespace std::this_thread;
+using namespace std::chrono;
 
 Robot::Robot(cv::Point3f pos, cv::Point3f ang, float width1, float length1, cv::Point3f leglengths)
 {
@@ -562,7 +566,8 @@ void Robot::walkC(Point3f steps)
 
 
     //usleep(500000);
-    waitKey(delay);
+    //waitKey(delay);
+    sleep_for(nanoseconds(delay));
 
     ///2
     steps.y = 2;
@@ -578,14 +583,17 @@ void Robot::walkC(Point3f steps)
 
 
     //usleep(500000);
-    waitKey(delay);
+    //waitKey(delay);
+    sleep_for(nanoseconds(delay));
 
     ///3
     move(steps1);
 
 
     //usleep(500000);
-    waitKey(delay);
+    //waitKey(delay);
+    sleep_for(nanoseconds(delay));
+
     steps.y = -2;
 
     legs[3].setLegEnd(legs[3].getJoints().D+steps);
@@ -598,7 +606,8 @@ void Robot::walkC(Point3f steps)
     legs[5].calculateAngles();
 
     //usleep(500000);
-    waitKey(delay);
+    //waitKey(delay);
+    sleep_for(nanoseconds(delay));
 
     ///4
     steps.y = 2;
@@ -613,25 +622,31 @@ void Robot::walkC(Point3f steps)
     legs[5].calculateAngles();
 
     //usleep(500000);
-    waitKey(delay);
+    //waitKey(delay);
+    sleep_for(nanoseconds(delay));
 }
 
 void Robot::walkRotC(float angle)
 {
     walkRot(angle);
-    waitKey(delay);
+    //waitKey(delay);
+    sleep_for(nanoseconds(delay));
 
     walkRot(angle);
-    waitKey(delay);
+    //waitKey(delay);
+    sleep_for(nanoseconds(delay));
 
     walkRot(angle);
-    waitKey(delay);
+    //waitKey(delay);
+    sleep_for(nanoseconds(delay));
 
     walkRot(angle);
-    waitKey(delay);
+    //waitKey(delay);
+    sleep_for(nanoseconds(delay));
 
     walkRot(angle);
-    waitKey(delay);
+    //waitKey(delay);
+    sleep_for(nanoseconds(delay));
 }
 
 void Robot::walk2C(Point3f steps)
@@ -659,7 +674,8 @@ void Robot::walk2C(Point3f steps)
         move(Point3f(0,0,sdi/2));
 
 
-        waitKey(1);
+        //waitKey(1);
+        sleep_for(nanoseconds(1));
     }
 
     for (double i = 0; i < z; i += di)
@@ -677,7 +693,8 @@ void Robot::walk2C(Point3f steps)
         move(Point3f(0,0,sdi/2));
 
 
-        waitKey(1);
+        //waitKey(1);
+        sleep_for(nanoseconds(1));
     }
 }
 
@@ -728,6 +745,7 @@ void Robot::walk3C(Point3f steps)
         move(Point3f(dx/2,0,dz/2));
 
         //waitKey(1);
+        sleep_for(nanoseconds(1));
     }
 
     for (double i = 0; i < x2; i += di)
@@ -746,6 +764,7 @@ void Robot::walk3C(Point3f steps)
         move(Point3f(dx/2,0,dz/2));
 
         //waitKey(1);
+        sleep_for(nanoseconds(1));
     }
 }
 
@@ -816,6 +835,7 @@ void Robot::walkRot3C(float angle)
         rotate(Point3f(0,da,0));
 
         //waitKey(1);
+        sleep_for(nanoseconds(1));
     }
 
     for (int k = 1; k < 6; k += 2)
@@ -842,5 +862,6 @@ void Robot::walkRot3C(float angle)
         rotate(Point3f(0,da,0));
 
         //waitKey(1);
+        sleep_for(nanoseconds(1));
     }
 }
