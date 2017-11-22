@@ -4,17 +4,17 @@ project( hex )
 set(CMAKE_CXX_STANDARD 11)
 
 set(OpenCV_INCLUDE_DIRS
-	/usr/local/include
-	/usr/local/include/opencv2
+	/home/pi/opencv/opencv/¬/home/pi/opencv/build/include
+    /home/pi/opencv/opencv/¬/home/pi/opencv/build/include/opencv2
 )
 
 set(OpenCV_LIB_DIR
-	/usr/local/lib
+	/home/pi/opencv/opencv/¬/home/pi/opencv/build/lib
 )
 
 set(OpenCV_LIBS
-	opencv_world
-	opencv_contrib_world
+	opencv_core
+	opencv_highgui
 	pthread
 )
 
