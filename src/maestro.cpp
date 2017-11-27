@@ -18,8 +18,10 @@ Maestro::Maestro() : device("/dev/ttyAMA0")
     tcgetattr(fd, &options);
     /*cfsetispeed(&options, B9600);
     cfsetospeed(&options, B9600);*/
-    cfsetispeed(&options, B230400);
-    cfsetospeed(&options, B230400);
+    /*cfsetispeed(&options, B230400);
+    cfsetospeed(&options, B230400);*/
+    cfsetispeed(&options, B115200);
+    cfsetospeed(&options, B115200);
 
     options.c_cflag &= ~PARENB;
     options.c_cflag &= ~CSTOPB;
