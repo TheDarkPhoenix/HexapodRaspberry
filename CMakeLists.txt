@@ -22,6 +22,7 @@ set(SOURCES
 	src/main.cpp
 	src/leg.h src/leg.cpp
 	src/robot.h src/robot.cpp
+	src/robotcontroler.h src/robotcontroler.cpp
 	src/maestro.h src/maestro.cpp
 	src/util.h
 	src/tcpconnector.h src/tcpconnector.cpp

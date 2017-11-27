@@ -55,7 +55,7 @@ int main()
 	                rob.control(key);
 	                if (stream->receive(&key, sizeof(key)) > 0) 
 	                {
-	                    cout << key << endl;
+	                    //cout << key << endl;
 	                }
 	            }
 	        }

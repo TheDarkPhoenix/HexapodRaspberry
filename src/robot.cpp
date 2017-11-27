@@ -696,7 +696,7 @@ void Robot::walkAsym(cv::Point3f steps)
 
     float x2 = sqrt(x*x + z*z);
 
-    float stepHeight = x!=0 ? 3 : 2; // wyzsze kroki przy chodzeniu na bok
+    float stepHeight = x!=0 ? 3 : 3; // wyzsze kroki przy chodzeniu na bok
 
     float a = (4*stepHeight)/(x2*x2);
     float di = 0.3;//0.08
