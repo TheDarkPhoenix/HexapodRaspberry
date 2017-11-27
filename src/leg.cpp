@@ -34,7 +34,7 @@ void Leg::setJointA(cv::Point3f joint1)
     legJoints.A = joint1;
 }
 
-void Leg::setAgnles(cv::Point3f angles1)
+void Leg::setAngles(cv::Point3f angles1)
 {
     angles = angles1;
 }
