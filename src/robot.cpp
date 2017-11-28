@@ -1,13 +1,10 @@
 #include "robot.h"
 #include <opencv2/highgui/highgui.hpp>
-#include <iostream>
-#include <strstream>
 #include <unistd.h>
 #include <chrono>
 #include <thread>
 
 using namespace cv;
-using namespace std;
 using namespace std::this_thread;
 using namespace std::chrono;
 
@@ -142,7 +139,6 @@ void Robot::moveCoordinates(Point3f p, Point3f ang)
     angles += ang;
 
     ang = -ang;
-
 
     Rx = (Mat_<float>(3,3) << 1, 0, 0, 0, cos(ang.x), -sin(ang.x), 0, sin(ang.x), cos(ang.x));
     Ry = (Mat_<float>(3,3) << cos(ang.y), 0, sin(ang.y), 0, 1, 0, -sin(ang.y), 0, cos(ang.y));
