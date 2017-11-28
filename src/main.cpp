@@ -6,8 +6,6 @@
 #include "tcpacceptor.h"
 #include "robotcontroler.h"
 
-#define SCALE 0.017453
-
 using namespace std;
 using namespace cv;
 
