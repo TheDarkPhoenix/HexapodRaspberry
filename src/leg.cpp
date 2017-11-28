@@ -23,47 +23,6 @@ void Leg::initJointPoints()
     calculateAngles();
 }
 
-
-void Leg::setServos(cv::Point3i servos1)
-{
-    servos = servos1;
-}
-
-void Leg::setJointA(cv::Point3f joint1)
-{
-    legJoints.A = joint1;
-}
-
-void Leg::setAngles(cv::Point3f angles1)
-{
-    angles = angles1;
-}
-
-void Leg::setR(cv::Mat R1)
-{
-    R = R1;
-}
-
-void Leg::setSignals(cv::Point3f sig)
-{
-    signals = sig;
-}
-
-void Leg::setLengths(cv::Point3f lengths1)
-{
-    lengths = lengths1;
-}
-
-void Leg::setLegEnd(cv::Point3f legEnd1)
-{
-    legEnd = legEnd1;
-}
-
-void Leg::setDevice(Maestro* dev)
-{
-    device = dev;
-}
-
 void Leg::calculateJointPoints()
 {
     Mat P1 = (Mat_<float>(3,1) << lengths.x, 0, 0);
