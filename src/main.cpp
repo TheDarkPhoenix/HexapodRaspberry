@@ -1,6 +1,9 @@
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <iostream>
+#include <memory>
+#include <thread>
+#include <mutex>
 #include <stdio.h>
 #include <stdlib.h>
 #include "tcpacceptor.h"
@@ -9,10 +12,40 @@
 using namespace std;
 using namespace cv;
 
+struct key
+{
+    char key;
+    mutex own;
+};
+
+void tcpkey(key* k)
+{
+    TCPStream* stream = NULL;
+    unique_ptr<TCPAcceptor> acceptor = make_unique<TCPAcceptor>(8080);
+
+    if (acceptor->start() != 0)
+        return;
+
+    while(1)
+    {
+        stream = acceptor->accept();
+        if (stream != NULL) 
+        { 
+            while(k->key != 27)
+            {
+                unique_lock<mutex> lck(k->own);
+                stream->receive(&(k->key), sizeof(k->key));
+            }
+        }
+        delete stream;
+    }
+    
+}
 
 int main()
 {
-    char key = 'm';
+    key k;
+    k.key = 'm';
 
     Point3f robotPosition(0, 17, 100);
     Point3f robotAngles(0,0,0);
@@ -27,6 +60,8 @@ int main()
 
     RobotControler rob(walkStep, rotStep, sMoveStep, sRotStep, robotPosition, robotAngles, robotWidth, robotLength, robotLegLenghts);
 
+    thread t1 {tcpkey, &k};
+
     ///Tryby:
     ///1 - stanie w miejscu i ruch translacyjny
     ///2 - stanie w miesjscu i obroty
@@ -37,28 +72,11 @@ int main()
 
     int mode = 6;
 
-    TCPStream* stream = NULL;
-    TCPAcceptor* acceptor = NULL;
-    acceptor = new TCPAcceptor(8080);
-
-    if (acceptor->start() == 0) 
+    
+    while(1)
     {
-        while(1)
-        {
-	        stream = acceptor->accept();
-	        if (stream != NULL) 
-	        { 
-	            while(key != 27)
-	            {
-	                rob.control(key);
-	                if (stream->receive(&key, sizeof(key)) > 0) 
-	                {
-	                    //cout << key << endl;
-	                }
-	            }
-	        }
-            delete stream;
-        }
+        unique_lock<mutex> lck(k.own);
+        rob.control(k.key);
     }
     return 0;
 }
