@@ -1,18 +1,12 @@
 #include "maestro.h"
 
-//#define RASP
-
 #include <fcntl.h>
 #include <stdio.h>
 #include <unistd.h>
 #include <cmath>
-#include <iostream>
-
-using namespace std;
 
 Maestro::Maestro() : device("/dev/ttyAMA0")
 {
-    #ifdef RASP
     fd = open(device, O_RDWR | O_NOCTTY);
 
     tcgetattr(fd, &options);
@@ -51,20 +45,15 @@ Maestro::Maestro() : device("/dev/ttyAMA0")
     {
         perror(device);
     }
-    #endif
 }
 
 Maestro::~Maestro()
 {
-    #ifdef RASP
     close(fd);
-    #endif
 }
 
 int Maestro::setTarget(unsigned char channel, unsigned short target)
 {
-    #ifdef RASP
-    //cout << "1" << endl;
     unsigned char command[] = {0xAA, 0xC, 0x04, channel, target & 0x7F, target >> 7 & 0x7F};
     if (write(fd, command, sizeof(command)) == -1)
     {
@@ -72,12 +61,10 @@ int Maestro::setTarget(unsigned char channel, unsigned short target)
         return -1;
     }
     return 0;
-    #endif
 }
 
 int Maestro::getError()
 {
-    #ifdef RASP
     unsigned char command[] = { 0xAA, 0xC, 0x21 };
     if (write(fd, command, sizeof(command)) != 3)
     {
@@ -108,12 +95,10 @@ int Maestro::getError()
     //printf("Error secon: %d\n", response[1]);
 
     return (int)sqrt(response[0] + 256*response[1]);
-    #endif
 }
 
 int Maestro::getPosition(unsigned char channel)
 {
-    #ifdef RASP
     unsigned char command[] = {0xAA, 0xC, 0x10, channel};
     if(write(fd, command, sizeof(command)) == -1)
     {
@@ -140,5 +125,4 @@ int Maestro::getPosition(unsigned char channel)
     } while (n < 2);
 
     return response[0] + 256*response[1];
-    #endif
 }

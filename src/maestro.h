@@ -1,21 +1,15 @@
 #ifndef MAESTRO_H
 #define MAESTRO_H
 
-#define RASP
-
-#ifdef RASP
 #include <termios.h>
-#endif
 
 class Maestro
 {
     private:
         const char * device;  // Linux
         int fd;
-
-        #ifdef RASP
         struct termios options;
-        #endif
+        
     public:
         Maestro();
         ~Maestro();
