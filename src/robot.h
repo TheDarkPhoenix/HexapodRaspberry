@@ -24,6 +24,8 @@ class Robot
         int delayShort; //delay used between each iteration in walk2C walk3C walkRot3C
         bool firstStep;
 
+        float walkingHeight;
+
         void moveCoordinates(cv::Point3f p, cv::Point3f ang);
 
     public:

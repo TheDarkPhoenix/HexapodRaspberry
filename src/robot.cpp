@@ -12,6 +12,7 @@ Robot::Robot(cv::Point3f pos, cv::Point3f ang, float width1, float length1, cv::
 {
     width = width1;
     length = length1;
+    walkingHeight = 4;
 
     for(int i = 0; i < 6; ++i)
     {
@@ -194,11 +195,10 @@ void Robot::rotate(Point3f ang)
 
 void Robot::walk(Point3f steps)
 {
-    float h = 4;
     if(walkingStep == 0)
     {
         steps.x /= 2;
-        steps.y = -h;
+        steps.y = -walkingHeight;
         steps.z /= 2;
         legs[0].setLegEnd(legs[0].getJoints().D+steps);
         legs[0].calculateAngles();
@@ -214,7 +214,7 @@ void Robot::walk(Point3f steps)
     else if(walkingStep == 1)
     {
         steps.x /= 2;
-        steps.y = h;
+        steps.y = walkingHeight;
         steps.z /= 2;
 
         legs[0].setLegEnd(legs[0].getJoints().D+steps);
@@ -237,7 +237,7 @@ void Robot::walk(Point3f steps)
     {
 
         steps.x/=2;
-        steps.y = -h;
+        steps.y = -walkingHeight;
         steps.z /=2;
 
         legs[3].setLegEnd(legs[3].getJoints().D+steps);
@@ -254,7 +254,7 @@ void Robot::walk(Point3f steps)
     else if(walkingStep == 4)
     {
         steps.x /= 2;
-        steps.y = h;
+        steps.y = walkingHeight;
         steps.z /= 2;
 
         legs[3].setLegEnd(legs[3].getJoints().D+steps);
@@ -284,7 +284,7 @@ void Robot::walkRot(float angle)
             Point3f g12 = Point3f(P11.at<float>(0,0), P11.at<float>(0,1), P11.at<float>(0,2));
             stepsl[i] = g12 - g11;
             stepsl[i].x /= 2;
-            stepsl[i].y = -2;
+            stepsl[i].y = -walkingHeight;
             stepsl[i].z /= 2;
         }
 
@@ -301,9 +301,9 @@ void Robot::walkRot(float angle)
     }
     else if(walkingStep == 1)
     {
-        stepsl[0].y = 2;
-        stepsl[4].y = 2;
-        stepsl[2].y = 2;
+        stepsl[0].y = walkingHeight;
+        stepsl[4].y = walkingHeight;
+        stepsl[2].y = walkingHeight;
 
         legs[0].setLegEnd(legs[0].getJoints().D+stepsl[0]);
         legs[0].calculateAngles();
@@ -331,7 +331,7 @@ void Robot::walkRot(float angle)
             Point3f g12 = Point3f(P11.at<float>(0,0), P11.at<float>(0,1), P11.at<float>(0,2));
             stepsl[i] = g12 - g11;
             stepsl[i].x /= 2;
-            stepsl[i].y = -2;
+            stepsl[i].y = -walkingHeight;
             stepsl[i].z /= 2;
         }
         legs[3].setLegEnd(legs[3].getJoints().D+stepsl[3]);
@@ -347,9 +347,9 @@ void Robot::walkRot(float angle)
     }
     else if(walkingStep == 4)
     {
-        stepsl[3].y = 2;
-        stepsl[1].y = 2;
-        stepsl[5].y = 2;
+        stepsl[3].y = walkingHeight;
+        stepsl[1].y = walkingHeight;
+        stepsl[5].y = walkingHeight;
 
         legs[3].setLegEnd(legs[3].getJoints().D+stepsl[3]);
         legs[3].calculateAngles();
@@ -372,7 +372,7 @@ void Robot::walkC(Point3f steps)
     steps.z /= 2;
 
     ///1
-    steps.y = -2;
+    steps.y = -walkingHeight;
 
     legs[0].setLegEnd(legs[0].getJoints().D+steps);
     legs[0].calculateAngles();
@@ -387,7 +387,7 @@ void Robot::walkC(Point3f steps)
     sleep_for(nanoseconds(delayLong));
 
     ///2
-    steps.y = 2;
+    steps.y = walkingHeight;
 
     legs[0].setLegEnd(legs[0].getJoints().D+steps);
     legs[0].calculateAngles();
@@ -406,7 +406,7 @@ void Robot::walkC(Point3f steps)
 
     sleep_for(nanoseconds(delayLong));
 
-    steps.y = -2;
+    steps.y = -walkingHeight;
 
     legs[3].setLegEnd(legs[3].getJoints().D+steps);
     legs[3].calculateAngles();
@@ -420,7 +420,7 @@ void Robot::walkC(Point3f steps)
     sleep_for(nanoseconds(delayLong));
 
     ///4
-    steps.y = 2;
+    steps.y = walkingHeight;
 
     legs[3].setLegEnd(legs[3].getJoints().D+steps);
     legs[3].calculateAngles();
@@ -458,7 +458,7 @@ void Robot::walk2C(Point3f steps)
     /// parabola -h*x(x-z)
     Point3f steps1 = steps;
     float z = steps1.z;
-    float a = (8)/(z*z);
+    float a = (4*walkingHeight)/(z*z);
     float di = 0.08;
     float sdi = (z<0)?-di:di;
     z = abs(z);
@@ -508,9 +508,9 @@ void Robot::walk3C(Point3f steps)
 
     float x2 = sqrt(x*x + z*z);
 
-    float stepHeight = x!=0 ? 3 : 2; // wyzsze kroki przy chodzeniu na bok
+    //float stepHeight = x!=0 ? 3 : 2; // wyzsze kroki przy chodzeniu na bok
 
-    float a = (4*stepHeight)/(x2*x2);
+    float a = (4*walkingHeight)/(x2*x2);
     float di = 0.45;//0.08
 
     float dz = 0, dx = 0;
@@ -599,7 +599,7 @@ void Robot::walkRot3C(float angle)
         z = steps1.z;
 
         x2[i] = sqrt(x*x + z*z);
-        a[i] = (-4*2)/(x2[i]*x2[i]);
+        a[i] = (-4*walkingHeight)/(x2[i]*x2[i]);
         di[i] = x2[i]*(da/(angle))*2;
         phi[i] = atan2(z, x);
 
@@ -692,9 +692,9 @@ void Robot::walkAsym(cv::Point3f steps)
 
     float x2 = sqrt(x*x + z*z);
 
-    float stepHeight = x!=0 ? 3 : 3; // wyzsze kroki przy chodzeniu na bok
+    //float stepHeight = x!=0 ? 3 : 3; // wyzsze kroki przy chodzeniu na bok
 
-    float a = (4*stepHeight)/(x2*x2);
+    float a = (4*walkingHeight)/(x2*x2);
     float di = 0.3;//0.08
     float dz = 0, dx = 0;
 
