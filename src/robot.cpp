@@ -743,3 +743,218 @@ void Robot::walkAsym(cv::Point3f steps)
         sleep_for(nanoseconds(delayShort));
     }
 }
+
+void Robot::walkAsym2start(cv::Point3f steps)
+{
+    int legOrder[6];
+    if(firstStep)
+    {
+        legOrder[0] = 0;
+        legOrder[1] = 4;
+        legOrder[2] = 2;
+        legOrder[3] = 3;
+        legOrder[4] = 1;
+        legOrder[5] = 5;
+        firstStep = false;
+    }
+    else
+    {
+        legOrder[0] = 3;
+        legOrder[1] = 1;
+        legOrder[2] = 5;
+        legOrder[3] = 0;
+        legOrder[4] = 4;
+        legOrder[5] = 2;
+        firstStep = true;
+    }
+
+    Point3f steps1 = steps;
+    float x = 2*steps1.x;
+    float y = steps1.y;
+    float z = 2*steps1.z;
+
+    float x2 = sqrt(x*x + z*z);
+
+
+    float a = (4*walkingHeight)/(x2*x2);
+    float di = 0.3;//0.08
+    float dz = 0, dx = 0;
+
+    if(z == 0)
+    {
+        dx = (x<0)?(-di):di;
+    }
+    else
+    {
+        dz = di*sqrt((x/z)*(x/z)+1);
+        dx = (x/z)*dz;
+
+        dz = (z<0)?(-abs(dz)):(abs(dz));
+        dx = (x<0)?(-abs(dx)):(abs(dx));
+    }
+
+    for (double i = 0; i < x2; i += di)
+    {
+        
+        steps = Point3f(dx, -(legs[legOrder[0]].getJoints().D.y - 16.3) + a*i*(i-x2), dz);
+
+        for(int j = 0; j < 3; ++j)
+        {
+            legs[legOrder[j]].setLegEnd(legs[legOrder[j]].getJoints().D+steps);
+            legs[legOrder[j]].calculateAngles();
+        }
+
+        move(Point3f(dx/2,0,dz/2));
+
+        sleep_for(nanoseconds(delayShort));
+    }
+}
+
+void Robot::walkAsym2(cv::Point3f steps)
+{
+    int legOrder[6];
+    if(firstStep)
+    {
+        legOrder[0] = 0;
+        legOrder[1] = 4;
+        legOrder[2] = 2;
+        legOrder[3] = 3;
+        legOrder[4] = 1;
+        legOrder[5] = 5;
+        firstStep = false;
+    }
+    else
+    {
+        legOrder[0] = 3;
+        legOrder[1] = 1;
+        legOrder[2] = 5;
+        legOrder[3] = 0;
+        legOrder[4] = 4;
+        legOrder[5] = 2;
+        firstStep = true;
+    }
+
+    Point3f steps1 = steps;
+    float x = 2*steps1.x;
+    float y = steps1.y;
+    float z = 2*steps1.z;
+
+    float x2 = sqrt(x*x + z*z);
+
+
+    float a = (4*walkingHeight)/(x2*x2);
+    float di = 0.3;//0.08
+    float dz = 0, dx = 0;
+
+    if(z == 0)
+    {
+        dx = (x<0)?(-di):di;
+    }
+    else
+    {
+        dz = di*sqrt((x/z)*(x/z)+1);
+        dx = (x/z)*dz;
+
+        dz = (z<0)?(-abs(dz)):(abs(dz));
+        dx = (x<0)?(-abs(dx)):(abs(dx));
+    }
+
+    for (double i = 0; i < x2; i += di)
+    {
+        
+        steps = Point3f(dx, -(legs[legOrder[0]].getJoints().D.y - 16.3) + a*i*(i-x2), dz);
+
+        for(int j = 0; j < 3; ++j)
+        {
+            legs[legOrder[j]].setLegEnd(legs[legOrder[j]].getJoints().D+steps);
+            legs[legOrder[j]].calculateAngles();
+        }
+
+        move(Point3f(dx/2,0,dz/2));
+
+        sleep_for(nanoseconds(delayShort));
+    }
+
+    for (double i = 0; i < x2; i += di)
+    {
+        
+        steps = Point3f(dx, -(legs[legOrder[3]].getJoints().D.y - 16.3) + a*i*(i-x2), dz);
+
+        for(int j = 3; j < 6; ++j)
+        {
+            legs[legOrder[j]].setLegEnd(legs[legOrder[j]].getJoints().D+steps);
+            legs[legOrder[j]].calculateAngles();
+        }
+
+        move(Point3f(dx/2,0,dz/2));
+
+        sleep_for(nanoseconds(delayShort));
+    }
+
+}
+
+void Robot::walkAsym2end(cv::Point3f steps)
+{
+    int legOrder[6];
+    if(firstStep)
+    {
+        legOrder[0] = 0;
+        legOrder[1] = 4;
+        legOrder[2] = 2;
+        legOrder[3] = 3;
+        legOrder[4] = 1;
+        legOrder[5] = 5;
+        firstStep = false;
+    }
+    else
+    {
+        legOrder[0] = 3;
+        legOrder[1] = 1;
+        legOrder[2] = 5;
+        legOrder[3] = 0;
+        legOrder[4] = 4;
+        legOrder[5] = 2;
+        firstStep = true;
+    }
+
+    Point3f steps1 = steps;
+    float x = 2*steps1.x;
+    float y = steps1.y;
+    float z = 2*steps1.z;
+
+    float x2 = sqrt(x*x + z*z);
+
+
+    float a = (4*walkingHeight)/(x2*x2);
+    float di = 0.3;//0.08
+    float dz = 0, dx = 0;
+
+    if(z == 0)
+    {
+        dx = (x<0)?(-di):di;
+    }
+    else
+    {
+        dz = di*sqrt((x/z)*(x/z)+1);
+        dx = (x/z)*dz;
+
+        dz = (z<0)?(-abs(dz)):(abs(dz));
+        dx = (x<0)?(-abs(dx)):(abs(dx));
+    }
+
+    for (double i = 0; i < x2; i += di)
+    {
+        
+        steps = Point3f(dx, -(legs[legOrder[0]].getJoints().D.y - 16.3) + a*i*(i-x2), dz);
+
+        for(int j = 3; j < 6; ++j)
+        {
+            legs[legOrder[j]].setLegEnd(legs[legOrder[j]].getJoints().D+steps);
+            legs[legOrder[j]].calculateAngles();
+        }
+
+        move(Point3f(dx/2,0,dz/2));
+
+        sleep_for(nanoseconds(delayShort));
+    }
+}

@@ -46,6 +46,7 @@ class Robot
         void walk2C(cv::Point3f steps);
         void walk3C(cv::Point3f steps);
         void walkAsym(cv::Point3f steps);
+        void walkAsym2(cv::Point3f steps, int numberOfSteps);
 
         void walkRot(float angle);
         void walkRotC(float angle);
