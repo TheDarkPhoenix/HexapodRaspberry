@@ -3,8 +3,8 @@
 #include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
-#include "tcpacceptor.h"
-#include "robotcontroler.h"
+#include "TCP/tcpacceptor.h"
+#include "Robot/robotcontroler.h"
 
 using namespace std;
 using namespace cv;

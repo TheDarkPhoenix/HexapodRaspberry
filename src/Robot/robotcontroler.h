@@ -2,12 +2,14 @@
 #define ROBOTCONTROLER_H
 
 #include <opencv2/core/core.hpp>
-#include "robot.h"
+#include "Robot/robot.h"
+#include "Robot/robotwalk.h"
 
 class RobotControler
 {
 	private:
 		Robot rob;
+		RobotWalk walker;
 
 		float walkStep; // length of step which robot will take
 		float rotStep; // angle of rotation of robot
@@ -20,23 +22,24 @@ class RobotControler
 
 		int mode;
 
+		bool started;
+		int walkingDirection;
 
 	public:
 		RobotControler(float walkStep1, float rotStep1, float sMoveStep1, float sRotStep1, cv::Point3f pos, cv::Point3f ang, float width1, float length1, cv::Point3f leglengths);
 
 		Robot& getRobot() {return rob;};
 
-		///direction:
-		/// 0 - forward
-		/// 1 - backward
-		/// 2 - left
-		/// 3 - right
-		void walk(int mode, char direction);
+		//simple walking
+		void mode3(char direction);
 
-		///direction:
-		/// 0 - clockwise
-		///	1 - counterclockwise
-		void rotate(int mode, char direction);
+		//automatic walking
+		void mode4(char direction);
+
+		//smooth walking
+		void mode5(char direction);
+
+		void mode6(char direction, int stage);
 
 		///directions
 		/// 0 - forward

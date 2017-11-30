@@ -1,4 +1,4 @@
-#include "robotcontroler.h"
+#include "Robot/robotcontroler.h"
 #include <iostream>
 #include <chrono>
 #include <thread>
@@ -18,7 +18,9 @@ RobotControler::RobotControler(float walkStep1, float rotStep1, float sMoveStep1
 	sRotStep = sRotStep1;
 	defaultRobotPosition = pos;
 	defaultRobotAngles = ang;
-	mode = 7;
+	mode = 6;
+    started = false;
+    walkingDirection = 0;
 }
 
 void RobotControler::control(char key)
@@ -57,11 +59,6 @@ void RobotControler::control(char key)
         	break;
     }
 
-    Point2f pkt;
-    int xMode = 0;
-    int yMode = 0;
-    int rotMode = 0;
-
     switch(mode)
     {
         case 1:
@@ -71,135 +68,160 @@ void RobotControler::control(char key)
             rotateBase(key);
             break;
         case 3:
-            xMode = 0;
-            yMode = 0;
-            rotMode = 0;
+            mode3(key);
             break;
         case 4:
-            xMode = 1;
-            yMode = 1;
-            rotMode = 1;
+            mode4(key);
             break;
         case 5:
-            xMode = 1;
-            yMode = 2;
-            rotMode = 1;
+            mode5(key);
             break;
         case 6:
-            xMode = 3;
-            yMode = 3;
-            rotMode = 2;
+            if(!started)
+            {
+                mode6(key, 0);
+            }
+            else
+                mode6(key, 1);
+
             break;
         case 7:
-            xMode = 3;
-            yMode = 4;
-            rotMode = 2;
+
             break;
         case 8:
-        	/*cout << "Podaj wspolrzedne: ";
-        	cin >> pkt.x >> pkt.y;
-        	walkToPoint(pkt);*/
-        	mode = 7;
-        	break;
+        
+            break;
         case 9:
-        	showoff();
-    		mode = 7;
-    		break;
+            showoff();
+            mode = 5;
+            break;
     }
 
-    if(mode >= 3 && mode <= 7)
+    if(started && (mode != 6))
     {
-        switch(key)
-        {
-            case 'W':
-            case 'S':
-                walk(yMode,key);
-                break;
-
-            case 'A':
-            case 'D':
-                walk(xMode,key);
-                break;
-            
-            case 'Q':
-            case 'E':
-                rotate(rotMode,key);
-                break;
-        }
+        if(walkingDirection == 1)
+            mode6('W', 2);
+        else if (walkingDirection == 2)
+            mode6('S', 2);
+        started = false;
     }
 }
 
-void RobotControler::walk(int mode, char direction)
+void RobotControler::mode6(char direction, int stage)
 {
-	Point3f step;
-	switch(direction)
-	{
-		case 'W':
-			step = Point3f(0,0,walkStep);
-			break;
-		case 'S':
-			step = Point3f(0,0,-walkStep);
-			break;
-		case 'A':
-			step = Point3f(-walkStep,0,0);
-			break;
-		case 'D':
-			step = Point3f(walkStep,0,0);
-			break;
-		default:
-			//cout << "Nieprawidłowy kierunek" << endl;
-			return;
-	}
+    switch(direction)
+    {
+        case 'D':
+            walker.walk(Point3f(walkStep, 0, 0), rob);
+            break;
+        case 'A':
+            walker.walk(Point3f(-walkStep, 0, 0), rob);
+            break;
+        case 'W':
+            
+            walker.walkStraightAlt2(walkStep, stage, rob);
 
-	switch(mode)
-	{
-		case 0:
-			rob.walk(step);
-			break;
-		case 1:
-			rob.walkC(step);
-			break;
-		case 2:
-			rob.walk2C(step);
-			break;
-		case 3:
-			rob.walk3C(step);
-			break;
-		case 4:
-			rob.walkAsym(step);
-			break;
-	}
-	
+            walkingDirection = 1;
+            
+            started = true;
+            break;
+        case 'S':
+            
+            walker.walkStraightAlt2(-walkStep, stage, rob);
+
+            walkingDirection = 2;
+            started = true;
+            break;
+        case 'E':
+            walker.rotation(rotStep, rob);
+            break;
+        case 'Q':
+            walker.rotation(-rotStep, rob);
+            break;
+        default:
+            return;
+    }
 }
 
-void RobotControler::rotate(int mode, char direction)
+void RobotControler::mode3(char direction)
 {
-	float angle;
-	switch(direction)
-	{
-		case 'Q':
-			angle = -rotStep;
-			break;
-		case 'E':
-			angle = rotStep;
-			break;
-		default:
-			//cout << "Nieprawidłowy kierunek";
-			return;
-	}
+    switch(direction)
+    {
+        case 'D':
+            walker.simpleWalk(Point3f(walkStep, 0, 0), rob);
+            break;
+        case 'A':
+            walker.simpleWalk(Point3f(-walkStep, 0, 0), rob);
+            break;
+        case 'W':
+            walker.simpleWalk(Point3f(0, 0, walkStep), rob);
+            break;
+        case 'S':
+            walker.simpleWalk(Point3f(0, 0, -walkStep), rob);
+            break;
+        case 'E':
+            walker.simpleRotation(rotStep, rob);
+            break;
+        case 'Q':
+            walker.simpleRotation(-rotStep, rob);
+            break;
+        default:
+            return;
+    }
+}
 
-	switch(mode)
-	{
-		case 0:
-			rob.walkRot(angle);
-			break;
-		case 1:
-			rob.walkRotC(angle);
-			break;
-		case 2:
-			rob.walkRot3C(angle);
-			break;
-	}
+void RobotControler::mode4(char direction)
+{
+    switch(direction)
+    {
+        case 'D':
+            walker.simpleAutomaticWalk(Point3f(walkStep, 0, 0), rob);
+            break;
+        case 'A':
+            walker.simpleAutomaticWalk(Point3f(-walkStep, 0, 0), rob);
+            break;
+        case 'W':
+            walker.simpleAutomaticWalk(Point3f(0, 0, walkStep), rob);
+            break;
+        case 'S':
+            walker.simpleAutomaticWalk(Point3f(0, 0, -walkStep), rob);
+            break;
+        case 'E':
+            walker.simpleAutomaticRotation(rotStep, rob);
+            break;
+        case 'Q':
+            walker.simpleAutomaticRotation(-rotStep, rob);
+            break;
+        default:
+            return;
+    }
+}
+
+void RobotControler::mode5(char direction)
+{
+    switch(direction)
+    {
+        case 'D':
+            walker.walk(Point3f(walkStep, 0, 0), rob);
+            break;
+        case 'A':
+            walker.walk(Point3f(-walkStep, 0, 0), rob);
+            break;
+        case 'W':
+            walker.walk(Point3f(0, 0, walkStep), rob);
+            break;
+        case 'S':
+            walker.walk(Point3f(0, 0, -walkStep), rob);
+            break;
+        case 'E':
+            walker.rotation(rotStep, rob);
+            break;
+        case 'Q':
+            walker.rotation(-rotStep, rob);
+            break;
+        default:
+            return;
+    }
 }
 
 void RobotControler::moveBase(char direction)
@@ -271,19 +293,22 @@ void RobotControler::walkToPoint(cv::Point2f point)
 
     for(int i = 0; i < rotateTimes; ++i)
     {
-        rob.walkRot3C(rotStep);
+        walker.rotation(rotStep, rob);
     }
-    rob.walkRot3C(differenceAngle-rotateTimes*rotStep);
+    walker.rotation(differenceAngle-rotateTimes*rotStep, rob);
 
     float distance = sqrt(point.x*point.x + point.y*point.y);
 
     int walkTimes = distance/walkStep;
 
+    //walker.walkStraightAlt2((distance-walkTimes*walkStep), 0, rob, view1);
+    walker.walkStraightAlt2(walkStep, 0, rob);
     for(int i = 0; i < walkTimes; ++i)
     {
-        rob.walkAsym(Point3f(0,0,walkStep));
+        walker.walkStraightAlt2(walkStep, 1, rob);
     }
-    rob.walkAsym(Point3f(0,0,distance-walkTimes*walkStep));
+    walker.walkStraightAlt2(walkStep, 2, rob);
+    //walker.walkStraightAlt2((distance-walkTimes*walkStep), 2, rob, view1);
 }
 
 void RobotControler::showoff()
