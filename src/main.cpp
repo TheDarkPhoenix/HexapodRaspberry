@@ -53,7 +53,21 @@ int main()
 	                rob.control(key);
 	                if (stream->receive(&key, sizeof(key)) > 0) 
 	                {
-	                    //cout << key << endl;
+	                    if(key == '8')
+                        {
+                            char p[2];
+                            stream->receive(p, sizeof(p));
+                            int x = p[2];
+                            x <<= 8;
+                            x |= p[1];
+
+                            stream->receive(p, sizeof(p));
+                            int y = p[2];
+                            y <<= 8;
+                            y |= p[1];
+
+                            rob.walkToPoint(Point(x,y));
+                        }
 	                }
 	            }
 	        }
