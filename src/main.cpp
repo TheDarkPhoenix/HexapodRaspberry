@@ -32,8 +32,10 @@ int main()
     ///2 - stanie w miesjscu i obroty
     ///3 - poruszanie siê manualne
     ///4 - poruszanie siê automatyczne
-    ///5 - automatyczne z poprawioną płynnością
-    ///6 - automatyczne z płynnym chodzeniem do przodu i zakręcaniem
+    ///5 - automatyczne z ruchem nogi po paraboli
+    ///6 - automatyczne bez wracania do pozycji początkowej
+    ///8 - chodzenie do punktu
+    ///9 - tryb pokazowy
 
     int mode = 6;
 
