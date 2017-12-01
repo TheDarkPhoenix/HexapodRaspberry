@@ -25,7 +25,10 @@ int main()
     float sMoveStep = 1;
     float sRotStep = 0.05;
 
-    RobotControler rob(walkStep, rotStep, sMoveStep, sRotStep, robotPosition, robotAngles, robotWidth, robotLength, robotLegLenghts);
+    int delayShort = 10;
+    float stepHeight = 4;
+
+    RobotControler rob(walkStep, rotStep, sMoveStep, sRotStep, delayShort, stepHeight, robotPosition, robotAngles, robotWidth, robotLength, robotLegLenghts);
 
     ///Tryby:
     ///1 - stanie w miejscu i ruch translacyjny

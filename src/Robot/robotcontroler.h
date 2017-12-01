@@ -22,24 +22,25 @@ class RobotControler
 
 		int mode;
 
-		bool started;
-		int walkingDirection;
+		bool startedStepAhead;
+		int directionStepAhead;
+
+		int directionContinuous;
 
 	public:
-		RobotControler(float walkStep1, float rotStep1, float sMoveStep1, float sRotStep1, cv::Point3f pos, cv::Point3f ang, float width1, float length1, cv::Point3f leglengths);
+		RobotControler(float walkStep1, float rotStep1, float sMoveStep1, float sRotStep1, int delayShort, float stepHeight, cv::Point3f pos, cv::Point3f ang, float width1, float length1, cv::Point3f leglengths);
 
 		Robot& getRobot() {return rob;};
 
-		//simple walking
-		void mode3(char direction);
+		void simpleWalking(char direction);
 
-		//automatic walking
-		void mode4(char direction);
+		void simpleAutomaticWalking(char direction);
 
-		//smooth walking
-		void mode5(char direction);
+		void smoothWalking(char direction);
 
-		void mode6(char direction, int stage);
+		void walkingStepAhead(char direction, int stage);
+
+		void continuousWalking(char direction);
 
 		///directions
 		/// 0 - forward

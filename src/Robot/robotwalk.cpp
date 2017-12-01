@@ -9,16 +9,16 @@ using namespace std::chrono;
 using namespace std;
 using namespace cv;
 
-RobotWalk::RobotWalk()
+RobotWalk::RobotWalk(int delayShort1, float stepHeight1)
 {
     walkingSequnceNo = 0;
     rotatingSequenceNo = 0;
 
     delayLong = 500;
-    delayShort = 10;
+    delayShort = delayShort1;
 
     firstStep = true;
-    stepHeight = 4;
+    stepHeight = stepHeight1;
 
     smallMotion = 0.3;
 }
@@ -124,7 +124,7 @@ void RobotWalk::walkStraightAlt(float step, Robot& rob)
     }
 }
 
-void RobotWalk::walkStraightAlt2(float step, int mode, Robot& rob)
+void RobotWalk::walkStepAhead(float step, int mode, Robot& rob)
 {
     int legOrder[6];
     

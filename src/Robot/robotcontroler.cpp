@@ -9,18 +9,24 @@ using namespace std::chrono;
 using namespace cv;
 using namespace std;
 
-RobotControler::RobotControler(float walkStep1, float rotStep1, float sMoveStep1, float sRotStep1, cv::Point3f pos, cv::Point3f ang, float width1, float length1, cv::Point3f leglengths)
- : rob(pos, ang, width1, length1, leglengths)
+RobotControler::RobotControler(float walkStep1, float rotStep1, float sMoveStep1, float sRotStep1, int delayShort, float stepHeight, cv::Point3f pos, cv::Point3f ang, float width1, float length1, cv::Point3f leglengths)
+ : rob(pos, ang, width1, length1, leglengths), walker(delayShort, stepHeight)
 {
 	walkStep = walkStep1;
 	rotStep = rotStep1;
+
 	sMoveStep = sMoveStep1;
 	sRotStep = sRotStep1;
+
 	defaultRobotPosition = pos;
 	defaultRobotAngles = ang;
+
 	mode = 6;
-    started = false;
-    walkingDirection = 0;
+
+    startedStepAhead = false;
+    directionStepAhead = 0;
+
+    directionContinuous = 0;
 }
 
 void RobotControler::control(char key)
@@ -54,7 +60,7 @@ void RobotControler::control(char key)
         case '9':
         	mode = 9;
         	break;
-        case 'R':
+        case 'r':
         	restart();
         	break;
     }
@@ -68,25 +74,25 @@ void RobotControler::control(char key)
             rotateBase(key);
             break;
         case 3:
-            mode3(key);
+            simpleWalking(key);
             break;
         case 4:
-            mode4(key);
+            simpleAutomaticWalking(key);
             break;
         case 5:
-            mode5(key);
+            smoothWalking(key);
             break;
         case 6:
-            if(!started)
+            if(!startedStepAhead)
             {
-                mode6(key, 0);
+                walkingStepAhead(key, 0);
             }
             else
-                mode6(key, 1);
+                walkingStepAhead(key, 1);
 
             break;
         case 7:
-
+            continuousWalking(key);
             break;
         case 8:
         
@@ -97,45 +103,45 @@ void RobotControler::control(char key)
             break;
     }
 
-    if(started && (mode != 6))
+    if(startedStepAhead && (mode != 6))
     {
-        if(walkingDirection == 1)
-            mode6('W', 2);
-        else if (walkingDirection == 2)
-            mode6('S', 2);
-        started = false;
+        if(directionStepAhead == 1)
+            walkingStepAhead('w', 2);
+        else if (directionStepAhead == 2)
+            walkingStepAhead('s', 2);
+        startedStepAhead = false;
     }
 }
 
-void RobotControler::mode6(char direction, int stage)
+void RobotControler::walkingStepAhead(char direction, int stage)
 {
     switch(direction)
     {
-        case 'D':
+        case 'd':
             walker.walk(Point3f(walkStep, 0, 0), rob);
             break;
-        case 'A':
+        case 'a':
             walker.walk(Point3f(-walkStep, 0, 0), rob);
             break;
-        case 'W':
+        case 'w':
             
-            walker.walkStraightAlt2(walkStep, stage, rob);
+            walker.walkStepAhead(walkStep, stage, rob);
 
-            walkingDirection = 1;
+            directionStepAhead = 1;
             
-            started = true;
+            startedStepAhead = true;
             break;
-        case 'S':
+        case 's':
             
-            walker.walkStraightAlt2(-walkStep, stage, rob);
+            walker.walkStepAhead(-walkStep, stage, rob);
 
-            walkingDirection = 2;
-            started = true;
+            directionStepAhead = 2;
+            startedStepAhead = true;
             break;
-        case 'E':
+        case 'e':
             walker.rotation(rotStep, rob);
             break;
-        case 'Q':
+        case 'q':
             walker.rotation(-rotStep, rob);
             break;
         default:
@@ -143,26 +149,61 @@ void RobotControler::mode6(char direction, int stage)
     }
 }
 
-void RobotControler::mode3(char direction)
+void RobotControler::continuousWalking(char direction)
+{
+    if(directionContinuous == 0)
+    {
+        switch(direction)
+        {
+            case 'w':
+                walker.walkStepAhead(walkStep, 0, rob);
+                directionContinuous = 1;
+                break;
+            case 's':
+                walker.walkStepAhead(-walkStep, 0, rob);
+                directionContinuous = 2;
+                break;
+        }
+    }
+    else
+    {
+        if(directionContinuous == 1)
+            walker.walkStepAhead(walkStep, 1, rob);
+        else if(directionContinuous == 2)
+            walker.walkStepAhead(-walkStep, 1, rob);
+
+        if(direction == 'z')
+        {
+            if(directionContinuous == 1)
+                walker.walkStepAhead(walkStep, 2, rob);
+            else if(directionContinuous == 2)
+                walker.walkStepAhead(-walkStep, 2, rob);
+
+            directionContinuous = 0;
+        }
+    }
+}
+
+void RobotControler::simpleWalking(char direction)
 {
     switch(direction)
     {
-        case 'D':
+        case 'd':
             walker.simpleWalk(Point3f(walkStep, 0, 0), rob);
             break;
-        case 'A':
+        case 'a':
             walker.simpleWalk(Point3f(-walkStep, 0, 0), rob);
             break;
-        case 'W':
+        case 'w':
             walker.simpleWalk(Point3f(0, 0, walkStep), rob);
             break;
-        case 'S':
+        case 's':
             walker.simpleWalk(Point3f(0, 0, -walkStep), rob);
             break;
-        case 'E':
+        case 'e':
             walker.simpleRotation(rotStep, rob);
             break;
-        case 'Q':
+        case 'q':
             walker.simpleRotation(-rotStep, rob);
             break;
         default:
@@ -170,26 +211,26 @@ void RobotControler::mode3(char direction)
     }
 }
 
-void RobotControler::mode4(char direction)
+void RobotControler::simpleAutomaticWalking(char direction)
 {
     switch(direction)
     {
-        case 'D':
+        case 'd':
             walker.simpleAutomaticWalk(Point3f(walkStep, 0, 0), rob);
             break;
-        case 'A':
+        case 'a':
             walker.simpleAutomaticWalk(Point3f(-walkStep, 0, 0), rob);
             break;
-        case 'W':
+        case 'w':
             walker.simpleAutomaticWalk(Point3f(0, 0, walkStep), rob);
             break;
-        case 'S':
+        case 's':
             walker.simpleAutomaticWalk(Point3f(0, 0, -walkStep), rob);
             break;
-        case 'E':
+        case 'e':
             walker.simpleAutomaticRotation(rotStep, rob);
             break;
-        case 'Q':
+        case 'q':
             walker.simpleAutomaticRotation(-rotStep, rob);
             break;
         default:
@@ -197,26 +238,26 @@ void RobotControler::mode4(char direction)
     }
 }
 
-void RobotControler::mode5(char direction)
+void RobotControler::smoothWalking(char direction)
 {
     switch(direction)
     {
-        case 'D':
+        case 'd':
             walker.walk(Point3f(walkStep, 0, 0), rob);
             break;
-        case 'A':
+        case 'a':
             walker.walk(Point3f(-walkStep, 0, 0), rob);
             break;
-        case 'W':
+        case 'w':
             walker.walk(Point3f(0, 0, walkStep), rob);
             break;
-        case 'S':
+        case 's':
             walker.walk(Point3f(0, 0, -walkStep), rob);
             break;
-        case 'E':
+        case 'e':
             walker.rotation(rotStep, rob);
             break;
-        case 'Q':
+        case 'q':
             walker.rotation(-rotStep, rob);
             break;
         default:
@@ -229,22 +270,22 @@ void RobotControler::moveBase(char direction)
 	Point3f step;
 	switch(direction)
 	{
-		case 'W':
+		case 'w':
 			step = Point3f(sMoveStep,0,0);
 			break;
-		case 'S':
+		case 's':
 			step = Point3f(-sMoveStep,0,0);
 			break;
-		case 'A':
+		case 'a':
 			step = Point3f(0,0,sMoveStep);
 			break;
-		case 'D':
+		case 'd':
 			step = Point3f(0,0,-sMoveStep);
 			break;
-		case 'Q':
+		case 'q':
 			step = Point3f(0,sMoveStep,0);
 			break;
-		case 'E':
+		case 'e':
 			step = Point3f(0,-sMoveStep,0);
 			break;
 		default:
@@ -259,22 +300,22 @@ void RobotControler::rotateBase(char direction)
 	Point3f rotation;
 	switch(direction)
 	{
-		case 'W':
+		case 'w':
 			rotation = Point3f(sRotStep,0,0);
 			break;
-		case 'S':
+		case 's':
 			rotation = Point3f(-sRotStep,0,0);
 			break;
-		case 'A':
+		case 'a':
 			rotation = Point3f(0,0,sRotStep);
 			break;
-		case 'D':
+		case 'd':
 			rotation = Point3f(0,0,-sRotStep);
 			break;
-		case 'Q':
+		case 'q':
 			rotation = Point3f(0,sRotStep,0);
 			break;
-		case 'E':
+		case 'e':
 			rotation = Point3f(0,-sRotStep,0);
 			break;
 		default:
@@ -302,12 +343,12 @@ void RobotControler::walkToPoint(cv::Point2f point)
     int walkTimes = distance/walkStep;
 
     //walker.walkStraightAlt2((distance-walkTimes*walkStep), 0, rob, view1);
-    walker.walkStraightAlt2(walkStep, 0, rob);
+    walker.walkStepAhead(walkStep, 0, rob);
     for(int i = 0; i < walkTimes; ++i)
     {
-        walker.walkStraightAlt2(walkStep, 1, rob);
+        walker.walkStepAhead(walkStep, 1, rob);
     }
-    walker.walkStraightAlt2(walkStep, 2, rob);
+    walker.walkStepAhead(walkStep, 2, rob);
     //walker.walkStraightAlt2((distance-walkTimes*walkStep), 2, rob, view1);
 }
 

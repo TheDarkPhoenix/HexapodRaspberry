@@ -25,7 +25,7 @@ class RobotWalk
 	
 	public:
 
-		RobotWalk();
+		RobotWalk(int delayShort1 = 10, float stepHeight1 = 4);
 
 		//simple walk with setting leg end to position in the middle
 		//each call to function provides different step of sequence ( 5 walkingSequnceNo)
@@ -41,7 +41,7 @@ class RobotWalk
 	    void walkStraightAlt(float step, Robot& rob);
 
 	    //modes 0 - start 1 - walking 2 - end
-	    void walkStraightAlt2(float step, int mode, Robot& rob);
+	    void walkStepAhead(float step, int mode, Robot& rob);
 
 	    //smooth steps in any direction
 	    void walk(cv::Point3f step, Robot& rob);
