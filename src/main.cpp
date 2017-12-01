@@ -71,6 +71,8 @@ int main()
                             y <<= 8;
                             y |= p[1];
 
+                            cout << x << ' ' << y << endl;
+
                             rob.walkToPoint(Point(x,y));
                         }
 	                }
